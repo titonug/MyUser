@@ -34,13 +34,12 @@
                     title='Edit'>
                     Edit
                 </a>
-                <a action="{{ route('list.destroy', 
-                ['list' => $list['id']]) }}" method="POST" alt='Delete' title='Delete'>
+                <form action="{{  action('ListController@destroy', ['list' => $list['id']] ) }}" method='POST' alt='Delete' title='Delete'>
                     @method('DELETE')
                     @csrf
                     <button type="submit" class="btn btn-link" title="Delete"
                     value="DELETE">Delete</button>
-                </a>
+                </form>
             </td>
         </tr>
         @endforeach

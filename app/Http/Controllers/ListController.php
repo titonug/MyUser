@@ -205,6 +205,7 @@ class ListController extends Controller
             Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Success']);
             $data = json_decode($list, TRUE);
 
+            dd($data);
             return redirect()->action('ListController@index');
         } catch (Exception $exception) {
             Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Error']);
