@@ -34,12 +34,12 @@
                     title='Edit'>
                     Edit
                 </a>
-                <a action="{{ action('ListController@destroy', 
+                <a action="{{ route('list.destroy', 
                 ['list' => $list['id']]) }}" method="POST" alt='Delete' title='Delete'>
                     @method('DELETE')
                     @csrf
-                    <button type="submit" class="btn btn-link delete" title="Delete"
-                    value="DELETE" onclick="popUpDelete()">Delete</button>
+                    <button type="submit" class="btn btn-link" title="Delete"
+                    value="DELETE">Delete</button>
                 </a>
             </td>
         </tr>

@@ -103,7 +103,7 @@ return [
 
         'mylog' => [
             'driver' => 'single',
-            'path' => storage_path('logs/api/13-07-21.log'),
+            'path' => storage_path('logs/api/14-07-21.log'),
             'level' => 'debug'
         ]
     ],

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use DataTables;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ListController extends Controller
 {
@@ -41,46 +42,6 @@ class ListController extends Controller
             return "Not Found";
         }
     }
-
-    // public function json(Request $request)
-    // {
-    //     //if ($request->ajax()) {
-
-    //         $title = "Index";
-    //         $titleContent = "Selamat Datang";
-
-    //         $curl = curl_init(); 
-    //         curl_setopt($curl, CURLOPT_URL, "https://jsonplaceholder.typicode.com/users/");
-    //         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); 
-    //         $list = curl_exec($curl); 
-    //         curl_close($curl);
-    //         $data = json_decode($list, TRUE);
-    //         // dd($data);
-    //         $dataTables = Datatables::of($list)->addIndexColumn()
-    //             ->addColumn('action', function($row){
-    //                $btn = '<a href="list/'.$row->id.'" class="edit btn btn-info btn-sm">View</a>';
-    //                 return $btn;
-    //             })
-    //             ->rawColumns(['action'])
-    //             ->make(true);
-
-
-    //         return $dataTables;
-    //         // return Datatables::of($data)
-    //         //         ->addIndexColumn()
-    //         //         ->addColumn('action', function($row){
-
-    //         //                $btn = '<a href="list/'.$row->id.'" class="edit btn btn-info btn-sm">View</a>';
-    //         //                 return $btn;
-    //         //         })
-    //         //         ->rawColumns(['action'])
-    //         //         ->make(true);
-    //    //}
-
-    //     //return view('bookings.index');
-    //     // $dataTables = DataTables::of($data)->make(true);
-    //     // return ($dataTables);
-    // }
 
 
     /**
@@ -122,7 +83,7 @@ class ListController extends Controller
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             $list = curl_exec($curl);
             curl_close($curl);
-            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['userID=' . $id, 'Result:Success']);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Success']);
             $data = json_decode($list, TRUE);
 
             $curl2 = curl_init();
@@ -130,7 +91,7 @@ class ListController extends Controller
             curl_setopt($curl2, CURLOPT_RETURNTRANSFER, 1);
             $list2 = curl_exec($curl2);
             curl_close($curl2);
-            Log::channel('mylog')->info('Endpoint API' . $url . 'posts/' . $id, ['userID=' . $id, 'Result:Success']);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'posts/' . $id, ['Show userID=' . $id, 'Result:Success']);
             $data2 = json_decode($list2, TRUE);
 
             return view('list.show')
@@ -139,7 +100,7 @@ class ListController extends Controller
                 ->with('titleContent', $titleContent)
                 ->with('title', $title);
         } catch (Exception $exception) {
-            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['userID=' . $id, 'Result:Error']);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Error']);
             return "Not Found";
         }
     }
@@ -162,7 +123,7 @@ class ListController extends Controller
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             $list = curl_exec($curl);
             curl_close($curl);
-            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['userID=' . $id, 'Result:Success']);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Edit userID=' . $id, 'Result:Success']);
 
             $data = json_decode($list, TRUE);
 
@@ -171,7 +132,7 @@ class ListController extends Controller
                 ->with('title', $title)
                 ->with('titleContent', $titleContent);
         } catch (Exception $exception) {
-            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['userID=' . $id, 'Result:Error']);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Edit userID=' . $id, 'Result:Error']);
             return "Not Found";
         }
     }
@@ -185,9 +146,43 @@ class ListController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $json = ['name' => $request->input('name'), 'email' => $request->input('email'), 'phone' => $request->input('phone')];
-        dd($json);
-        return redirect()->action('ListController@index');
+        // $json = ['name' => $request->input('name'), 'email' => $request->input('email'), 'phone' => $request->input('phone')];
+        // dd($json);
+        // return redirect()->action('ListController@index');
+
+        try {
+
+            $url = env('JSON_BASE_URL');
+
+            $curl2 = curl_init();
+
+            $data_array =  array(
+                "name"        => $request->input('name'),
+                "email"     => $request->input('email'),
+                "phone"      => $request->input('phone')
+            );
+            $headers = [
+                "Content-Type: 'application/json; charset=UTF-8'"
+            ];
+
+            curl_setopt($curl2, CURLOPT_URL, $url . "users/". Auth::user()->id);
+            curl_setopt($curl2, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl2, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($curl2, CURLOPT_POSTFIELDS, json_encode($data_array));
+            //curl_setopt($curl2, CURLOPT_HTTPHEADER, $headers);
+            $list2 = curl_exec($curl2);
+
+            curl_close($curl2);
+            $data = json_decode($list2, TRUE);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . Auth::user()->id, ['Edit userID=' . $id, 'Result:Success']);
+
+            dd($data);
+
+            return redirect()->action('ListController@index');
+        } catch (Exception $exception) {
+            Log::channel('mylog')->info('Endpoint API' . $url . 'posts', ['Edit userID=' . $id, 'Result:Error']);
+            return "Not Found";
+        }
     }
 
     /**
@@ -197,7 +192,24 @@ class ListController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        return redirect()->action('ListController@index');
+    {   
+        try {
+            $url = env('JSON_BASE_URL');
+
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url . "users/" . $id);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+            $list = curl_exec($curl);
+            curl_close($curl);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Success']);
+            $data = json_decode($list, TRUE);
+
+            return redirect()->action('ListController@index');
+        } catch (Exception $exception) {
+            Log::channel('mylog')->info('Endpoint API' . $url . 'users/' . $id, ['Show userID=' . $id, 'Result:Error']);
+            return "Not Found";
+        }
+        //return redirect()->action('ListController@index');
     }
 }

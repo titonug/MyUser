@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,9 +61,41 @@ class PostController extends Controller
     public function store(Request $request)
     {
 
-        $json = ['userId' => Auth::user()->id, 'id' => '100', 'title' => $request->input('title'), 'body' => $request->input('post')];
-        dd($json);
-        return redirect()->action('ListController@index');
+        // $json = ['userId' => Auth::user()->id, 'id' => '100', 'title' => $request->input('title'), 'body' => $request->input('post')];
+        // dd($json);
+        // return redirect()->action('ListController@index');
+        try {
+
+            $url = env('JSON_BASE_URL');
+
+            $curl2 = curl_init();
+
+            $data_array =  array(
+                "userId"        => Auth::user()->id,
+                "title"     => $request->input('title'),
+                "body"      => $request->input('post')
+            );
+            $headers = [
+                "Content-Type: 'application/json; charset=UTF-8'"
+            ];
+
+            curl_setopt($curl2, CURLOPT_URL, $url . "posts?userId=" . Auth::user()->id);
+            curl_setopt($curl2, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl2, CURLOPT_POSTFIELDS, json_encode($data_array));
+            //curl_setopt($curl2, CURLOPT_HTTPHEADER, $headers);
+            $list2 = curl_exec($curl2);
+
+            curl_close($curl2);
+            $data = json_decode($list2, TRUE);
+            Log::channel('mylog')->info('Endpoint API' . $url . 'posts?userId=' . Auth::user()->id, ['get', 'Result:Success']);
+
+            dd($data);
+
+            return redirect()->action('ListController@index');
+        } catch (Exception $exception) {
+            Log::channel('mylog')->info('Endpoint API' . $url . 'posts', ['get', 'Result:Error']);
+            return "Not Found";
+        }
     }
 
     /**

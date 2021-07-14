@@ -55,45 +55,6 @@
 </script>
 
 
-<script>
-  $(function() {
-
-
-    $('#example1').DataTable({
-      processing: true,
-      serverSide: true,
-      ajax: {
-        "url": "/json",
-      },
-      columns: [{
-          data: ['id'],
-          name: ['id']
-        },
-        {
-          data: ['name'],
-          name: ['name']
-        },
-        {
-          data: ['username'],
-          name: ['username']
-        },
-        {
-          data: 'action',
-          name: 'action',
-          orderable: false,
-          searchable: false
-        },
-      ]
-    });
-  });
-</script>
-
 
 
 </html>
-
-<script>
-  function popUpDelete() {
-    window.alert("Data Has Been Deleted");
-  };
-</script>
